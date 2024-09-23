@@ -1,4 +1,4 @@
---Destruindo todas as tabelas para realizar atualizações
+-- Destruindo todas as tabelas para realizar atualizações
 
 DROP TABLE IF EXISTS usuario_obras_favoritas CASCADE;
 DROP TABLE IF EXISTS cartao CASCADE;
@@ -14,28 +14,28 @@ DROP TABLE IF EXISTS comprador CASCADE;
 DROP TABLE IF EXISTS artista CASCADE;
 DROP TABLE IF EXISTS usuario CASCADE;
 
---CRIAÇÃO DAS TABELAS DE CLASSES E TABELAS DE RELAÇÕES ENTRE AS CLASSES
+-- CRIAÇÃO DAS TABELAS DE CLASSES E TABELAS DE RELAÇÕES ENTRE AS CLASSES
 
 -- Criando a tabela abstrata "usuario"
 CREATE TABLE usuario (
-    id SERIAL PRIMARY KEY, --ID
-    nome VARCHAR(100) NOT NULL, --nome
-    email VARCHAR(100) UNIQUE NOT NULL, --email unico
+    id SERIAL PRIMARY KEY, -- ID
+    nome VARCHAR(100) NOT NULL, -- nome
+    email VARCHAR(100) UNIQUE NOT NULL, -- email unico
     senha VARCHAR(100) NOT NULL, -- senha
-    nacionalidade VARCHAR(50), --nacionalidade
-    biografia TEXT --biografia
+    nacionalidade VARCHAR(50), -- nacionalidade
+    biografia TEXT -- biografia
 );
 
 -- Criando a tabela "artista" que herda de "usuario"
 CREATE TABLE artista (
-    id INT PRIMARY KEY, --id do artista
-    conta_bancaria VARCHAR(100), --conta do banco
-    FOREIGN KEY (id) REFERENCES usuario(id) ON DELETE CASCADE --id do usuário atrelada ao artista
+    id INT PRIMARY KEY, -- id do artista
+    conta_bancaria VARCHAR(100), -- conta do banco
+    FOREIGN KEY (id) REFERENCES usuario(id) ON DELETE CASCADE -- id do usuário atrelada ao artista
 );
 
 -- Criando a tabela "comprador" que herda de "usuario"
 CREATE TABLE comprador (
-    id INT PRIMARY KEY, --ID comprador
+    id INT PRIMARY KEY, -- ID comprador
     FOREIGN KEY (id) REFERENCES usuario(id) ON DELETE CASCADE -- id do usuário atrelado ao comprador
 );
 
@@ -43,7 +43,7 @@ CREATE TABLE comprador (
 CREATE TABLE cartao (
     id SERIAL PRIMARY KEY, -- id do cartão
     numero_cartao VARCHAR(16) NOT NULL, -- numero cartão
-    validade DATE NOT NULL, --data da validade
+    validade DATE NOT NULL, -- data da validade
     cvv VARCHAR(4) NOT NULL, -- cvv
     comprador_id INT REFERENCES comprador(id) ON DELETE CASCADE -- id do comprador atrelado ao cartão
 );
@@ -69,14 +69,14 @@ CREATE TABLE tecnica (
 
 -- Criando a tabela "objeto" que herda de "obra_de_arte"
 CREATE TABLE objeto (
-    id INT PRIMARY KEY, --id do objeto
-    FOREIGN KEY (id) REFERENCES obra_de_arte(id) ON DELETE CASCADE --id fo objeto vai ser o mesmo que da obra de arte
+    id INT PRIMARY KEY, -- id do objeto
+    FOREIGN KEY (id) REFERENCES obra_de_arte(id) ON DELETE CASCADE -- id fo objeto vai ser o mesmo que da obra de arte
 );
 
 -- Criando a tabela "material" para associar vários materiais a um objeto
 CREATE TABLE material (
     id SERIAL PRIMARY KEY, -- id do material
-    nome VARCHAR(100) NOT NULL, --qual mateiral é
+    nome VARCHAR(100) NOT NULL, -- qual mateiral é
     objeto_id INT REFERENCES objeto(id) ON DELETE CASCADE -- id do objeto que usa esse material
 );
 
@@ -88,30 +88,29 @@ CREATE TABLE pintura (
 
 -- Criando a tabela de relacionamento "usuario_obras_favoritas"
 CREATE TABLE usuario_obras_favoritas (
-    usuario_id INT REFERENCES usuario(id) ON DELETE CASCADE, --ID do usuári0
-    obra_de_arte_id INT REFERENCES obra_de_arte(id) ON DELETE CASCADE, --ID da obra de arte favorita
+    usuario_id INT REFERENCES usuario(id) ON DELETE CASCADE, -- ID do usuári0
+    obra_de_arte_id INT REFERENCES obra_de_arte(id) ON DELETE CASCADE, -- ID da obra de arte favorita
     PRIMARY KEY (usuario_id, obra_de_arte_id)
 );
 
 -- Criando a tabela "lance" para associar lances às obras de arte
 CREATE TABLE lance (
     id SERIAL PRIMARY KEY, -- lance
-    valor NUMERIC(10, 2) NOT NULL, --valor do lance (decimal com no máximo 2 casas decimais)
+    valor NUMERIC(10, 2) NOT NULL, -- valor do lance (decimal com no máximo 2 casas decimais)
     comprador_id INT REFERENCES comprador(id) ON DELETE SET NULL, -- id do comprador
     obra_de_arte_id INT REFERENCES obra_de_arte(id) ON DELETE CASCADE, -- id da obra de arte
-    artista_id INT REFERENCES artista(id) ON DELETE SET NULL, -- id do artista
     data_fim_leilao DATE NOT NULL -- data do fim deste leilão
 );
 
 -- Adicionando a coluna maior_lance_id à tabela obra_de_arte
---Sendo criada depois para não interfirir na tabela lance
+-- Sendo criada depois para não interfirir na tabela lance
 ALTER TABLE obra_de_arte
 ADD COLUMN maior_lance_id INT REFERENCES lance(id) ON DELETE SET NULL;
 
 -- Criando a tabela "comentario"
 CREATE TABLE comentario (
     id SERIAL PRIMARY KEY, -- id do comentário
-    obra_de_arte_id INT REFERENCES obra_de_arte(id) ON DELETE CASCADE, --id da obra que teve o comentario
+    obra_de_arte_id INT REFERENCES obra_de_arte(id) ON DELETE CASCADE, -- id da obra que teve o comentario
     data_hora TIMESTAMP NOT NULL, -- hora e data de quando foi comentado
     texto TEXT NOT NULL, -- texto do comentario
     usuario_id INT REFERENCES usuario(id) ON DELETE CASCADE -- id do usuário
@@ -120,11 +119,11 @@ CREATE TABLE comentario (
 
 -- Criando a tabela "leilao"
 CREATE TABLE leilao (
-    id SERIAL PRIMARY KEY, --id do leilão
+    id SERIAL PRIMARY KEY, -- id do leilão
     obra_de_arte_id INT UNIQUE REFERENCES obra_de_arte(id) ON DELETE CASCADE -- obra de arte que está em leilão
 );
 
---INSERINDO OS VALORES NA TABELA E TESTANDO SE REALMENTE ESTÃO SENDO INSERIDOS
+-- INSERINDO OS VALORES NA TABELA E TESTANDO SE REALMENTE ESTÃO SENDO INSERIDOS
 
 -- Inserindo 10 artistas
 INSERT INTO usuario (nome, email, senha, nacionalidade, biografia)
@@ -277,18 +276,18 @@ VALUES
 ('Material J', 10);
 
 -- Inserindo 10 lances para as obras em leilão
-INSERT INTO lance (valor, comprador_id, obra_de_arte_id, artista_id, data_fim_leilao)
+INSERT INTO lance (valor, comprador_id, obra_de_arte_id, data_fim_leilao)
 VALUES 
-(1000.00, 11, 1, 1, '2024-12-31'),
-(1500.00, 12, 3, 3, '2024-12-31'),
-(2000.00, 13, 5, 5, '2024-12-31'),
-(2500.00, 14, 7, 7, '2024-12-31'),
-(3000.00, 15, 9, 9, '2024-12-31'),
-(1200.00, 16, 11, 1, '2024-12-31'),
-(1700.00, 17, 13, 3, '2024-12-31'),
-(2200.00, 18, 15, 5, '2024-12-31'),
-(2700.00, 19, 17, 7, '2024-12-31'),
-(3200.00, 20, 19, 9, '2024-12-31');
+(1000.00, 11, 1, '2024-12-31'),
+(1500.00, 12, 3, '2024-12-31'),
+(2000.00, 13, 5, '2024-12-31'),
+(2500.00, 14, 7, '2024-12-31'),
+(3000.00, 15, 9, '2024-12-31'),
+(1200.00, 16, 11, '2024-12-31'),
+(1700.00, 17, 13, '2024-12-31'),
+(2200.00, 18, 15, '2024-12-31'),
+(2700.00, 19, 17,  '2024-12-31'),
+(3200.00, 20, 19, '2024-12-31');
 
 -- Inserindo 10 comentários associados às obras de arte
 INSERT INTO comentario (obra_de_arte_id, data_hora, texto, usuario_id)
@@ -323,10 +322,10 @@ UPDATE obra_de_arte
 SET maior_lance_id = (
     SELECT id FROM lance 
     WHERE lance.obra_de_arte_id = obra_de_arte.id 
-    ORDER BY valor DESC --organizando a ordem do maior ao menor
-    LIMIT 1 --primeiro valor ser pego
+    ORDER BY valor DESC -- organizando a ordem do maior ao menor
+    LIMIT 1 -- primeiro valor ser pego
 )
-WHERE em_leilao = TRUE; --se estiver no leilão
+WHERE em_leilao = TRUE; -- se estiver no leilão
 
 -- Inserir todas as obras de arte em leilão na tabela de leilão
 INSERT INTO leilao (obra_de_arte_id)
@@ -334,7 +333,7 @@ SELECT id
 FROM obra_de_arte
 WHERE em_leilao = TRUE;
 
---Verificando e existencia de tudo que foi inserido
+-- Verificando e existencia de tudo que foi inserido
 
 -- Verificar os usuários
 SELECT * FROM usuario;
@@ -375,19 +374,19 @@ SELECT * FROM leilao;
 -- Verificar as obras favoritas dos usuários
 SELECT * FROM usuario_obras_favoritas;
 
---Testando se a relação em cascata está funcionando
+-- Testando se a relação em cascata está funcionando
 
---Deletando usuário
+-- Deletando usuário
 DELETE FROM usuario WHERE id = 1;
 
---Se eu deletar um Artista todas as seguintes informações serão deletadas
---Obra do artista
---Lances relacionados a obra
---Materiais
---Tecnica
---Comentário
---Obras Favoritas
---Pintura ou Objeto
+-- Se eu deletar um Artista todas as seguintes informações serão deletadas
+-- Obra do artista
+-- Lances relacionados a obra
+-- Materiais
+-- Tecnica
+-- Comentário
+-- Obras Favoritas
+-- Pintura ou Objeto
 
 
 -- Verificar os usuários
@@ -422,6 +421,3 @@ SELECT * FROM leilao;
 
 -- Verificar as obras favoritas dos usuários
 SELECT * FROM usuario_obras_favoritas;
-
-
-
